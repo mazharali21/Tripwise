@@ -1,0 +1,186 @@
+﻿@page "/destinations/{Id:int}"
+@rendermode InteractiveServer
+@inject NavigationManager Nav
+
+<PageTitle>@Current.Name - TripWise</PageTitle>
+
+<div class="tw-details">
+    <a href="/destinations" class="tw-back">← Back to All Destinations</a>
+
+    <!-- Banner -->
+    <div class="tw-detail-hero" style="background-image: linear-gradient(to top, rgba(15,23,42,0.85), rgba(15,23,42,0.2)), url('@Current.ImageUrl')">
+        <div class="tw-detail-hero-text">
+            <span class="tw-pill-badge">@Current.Category • ★ @Current.Rating (120+ Reviews)</span>
+            <h1>@Current.Name</h1>
+            <p>📍 @Current.Region</p>
+        </div>
+    </div>
+
+    <!-- Two Column Layout -->
+    <div class="tw-detail-grid">
+        <!-- Left Info -->
+        <div class="tw-main-col">
+            <div class="tw-box">
+                <h2>Overview</h2>
+                <p>@Current.Overview</p>
+
+                <div class="tw-highlights">
+                    <div class="tw-hl-item"><strong>🗓️ Best Season</strong><span>@Current.BestSeason</span></div>
+                    <div class="tw-hl-item"><strong>⏱️ Ideal Duration</strong><span>@Current.Duration</span></div>
+                    <div class="tw-hl-item"><strong>⛰️ Altitude</strong><span>@Current.Altitude</span></div>
+                </div>
+            </div>
+
+            <div class="tw-box">
+                <h2>Top Attractions & Things to Do</h2>
+                <ul class="tw-attractions">
+                    @foreach (var spot in Current.Attractions)
+                    {
+                        <li>✅ @spot</li>
+                    }
+                </ul>
+            </div>
+
+            <div class="tw-box">
+                <h2>Sample 3-Day Itinerary</h2>
+                <div class="tw-timeline">
+                    <div class="tw-day"><strong>Day 1:</strong> Arrival, hotel check-in, sunset viewpoint walk & traditional dinner.</div>
+                    <div class="tw-day"><strong>Day 2:</strong> Full-day guided sightseeing tour covering major lakes, forts, and valleys.</div>
+                    <div class="tw-day"><strong>Day 3:</strong> Local bazaar souvenir shopping, cultural breakfast, and departure.</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Booking / Planner Card -->
+        <div class="tw-side-col">
+            <div class="tw-booking-card">
+                <span class="tw-price-label">Estimated Package</span>
+                <div class="tw-big-price">PKR @Current.Price <small>/ person</small></div>
+
+                <label>Select Travel Date</label>
+                <input type="date" @bind="travelDate" class="tw-input" />
+
+                <label>Number of Travelers</label>
+                <input type="number" min="1" max="15" @bind="travelers" class="tw-input" />
+
+                <button class="tw-book-btn" @onclick="ConfirmPlan">Add to My Trip Plan</button>
+
+                @if (planSaved)
+                {
+                    <div class="tw-success-msg">
+                        🎉 Trip to <strong>@Current.Name</strong> for @travelers traveler(s) added to your planner!
+                    </div>
+                }
+
+                <div class="tw-quick-links">
+                    <a href="/hotels">🏨 View Nearby Hotels</a>
+                    <a href="/restaurants">🍽️ Explore Local Restaurants</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .tw-details { font-family: 'Segoe UI', system-ui, sans-serif; color: #1e293b; max-width: 1150px; margin: 0 auto; }
+    .tw-back { display: inline-block; margin-bottom: 1rem; color: #0284c7; font-weight: 600; text-decoration: none; }
+    .tw-detail-hero {
+        height: 340px;
+        background-size: cover;
+        background-position: center;
+        border-radius: 18px;
+        display: flex;
+        align-items: flex-end;
+        padding: 2rem;
+        color: #fff;
+        margin-bottom: 2rem;
+    }
+    .tw-pill-badge { background: #0284c7; padding: 5px 12px; border-radius: 999px; font-size: 0.82rem; font-weight: 600; }
+    .tw-detail-hero-text h1 { font-size: 2.5rem; margin: 0.5rem 0 4px; font-weight: 800; }
+    .tw-detail-hero-text p { margin: 0; color: #e2e8f0; font-size: 1.05rem; }
+    .tw-detail-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 1.75rem; }
+    @@media (max-width: 850px) { .tw-detail-grid { grid-template-columns: 1fr; } }
+    .tw-box {
+        background: #fff;
+        border: 1px solid #e2e8f0;
+        border-radius: 14px;
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+    }
+    .tw-box h2 { font-size: 1.35rem; margin: 0 0 1rem; }
+    .tw-box p { color: #475569; line-height: 1.65; }
+    .tw-highlights {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 1rem;
+        margin-top: 1.25rem;
+        background: #f8fafc;
+        padding: 1rem;
+        border-radius: 10px;
+    }
+    .tw-hl-item strong { display: block; font-size: 0.82rem; color: #64748b; }
+    .tw-hl-item span { font-weight: 700; color: #0f172a; }
+    .tw-attractions { list-style: none; padding: 0; margin: 0; display: grid; gap: 10px; }
+    .tw-attractions li { background: #f8fafc; padding: 10px 14px; border-radius: 8px; font-weight: 500; }
+    .tw-timeline { display: grid; gap: 12px; }
+    .tw-day { border-left: 3px solid #0284c7; padding-left: 12px; color: #334155; }
+    .tw-booking-card {
+        background: #fff;
+        border: 1px solid #cbd5e1;
+        border-radius: 16px;
+        padding: 1.5rem;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.06);
+        position: sticky;
+        top: 20px;
+    }
+    .tw-price-label { font-size: 0.85rem; color: #64748b; }
+    .tw-big-price { font-size: 1.8rem; font-weight: 800; color: #0f172a; margin-bottom: 1.25rem; }
+    .tw-big-price small { font-size: 0.9rem; font-weight: 400; color: #64748b; }
+    .tw-booking-card label { display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 5px; }
+    .tw-input { width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 8px; margin-bottom: 1rem; box-sizing: border-box; }
+    .tw-book-btn {
+        width: 100%;
+        background: #0284c7;
+        color: #fff;
+        border: none;
+        padding: 12px;
+        border-radius: 10px;
+        font-size: 1rem;
+        font-weight: 700;
+        cursor: pointer;
+    }
+    .tw-book-btn:hover { background: #0369a1; }
+    .tw-success-msg { background: #dcfce7; color: #166534; padding: 10px; border-radius: 8px; margin-top: 1rem; font-size: 0.88rem; }
+    .tw-quick-links { margin-top: 1.25rem; padding-top: 1rem; border-top: 1px solid #e2e8f0; display: grid; gap: 8px; }
+    .tw-quick-links a { color: #0284c7; text-decoration: none; font-weight: 600; font-size: 0.92rem; }
+</style>
+
+@code {
+    [Parameter] public int Id { get; set; }
+
+    private DateTime travelDate = DateTime.Today.AddDays(7);
+    private int travelers = 2;
+    private bool planSaved = false;
+
+    private void ConfirmPlan() => planSaved = true;
+
+    private record DestDetail(int Id, string Name, string Region, string Category, double Rating, string BestSeason, string Duration, string Altitude, string Price, string Overview, string ImageUrl, List<string> Attractions);
+
+    private List<DestDetail> DetailsList = new()
+    {
+        new(1, "Hunza Valley", "Gilgit-Baltistan", "Mountains", 4.9, "April - October", "5 Days / 4 Nights", "2,438 m", "28,000",
+            "Hunza Valley is a mountainous paradise famous for dramatic peaks like Rakaposhi and Ultar Sar, centuries-old forts, turquoise glacial lakes, and warm hospitality.",
+            "https://unsplash.com",
+            new() { "Attabad Lake Boating & Jet Ski", "Baltit & Altit Heritage Forts", "Passu Cones & Hussaini Suspension Bridge", "Eagle's Nest Sunset Viewpoint" }),
+        new(2, "Skardu Valley", "Gilgit-Baltistan", "Mountains", 4.9, "May - September", "6 Days / 5 Nights", "2,228 m", "32,000",
+            "Skardu serves as the gateway to the world's highest peaks, offering serene alpine lakes, high-altitude plains at Deosai, and dramatic cold desert landscapes.",
+            "https://unsplash.com",
+            new() { "Lower & Upper Kachura Lakes", "Deosai National Park (Land of Giants)", "Sarfaranga Cold Desert Jeep Safari", "Shigar Fort & Manthoka Waterfall" }),
+        new(3, "Swat & Kalam", "Khyber Pakhtunkhwa", "Nature", 4.8, "March - October", "4 Days / 3 Nights", "2,000 m", "18,500",
+            "Known for emerald rivers, dense pine forests, and snow-fed lakes, Swat & Kalam offer an accessible and refreshing mountain retreat.",
+            "https://unsplash.com",
+            new() { "Mahodand Lake & Ushu Forest", "Malam Jabba Ski Resort & Chairlift", "Bahrain Riverside Bazar", "White Palace Marghazar" })
+    };
+
+    private DestDetail Current => DetailsList.FirstOrDefault(x => x.Id == Id) ?? DetailsList[0];
+}

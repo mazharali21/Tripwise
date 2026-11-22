@@ -1,0 +1,180 @@
+﻿@page "/destinations"
+@rendermode InteractiveServer
+@inject NavigationManager Nav
+
+<PageTitle>Explore Destinations - TripWise</PageTitle>
+
+<div class="tw-explore">
+    <div class="tw-explore-header">
+        <h1>Explore Destinations</h1>
+        <p>Filter by region, category, or search your dream getaway</p>
+    </div>
+
+    <!-- Search & Category Filter Bar -->
+    <div class="tw-filter-bar">
+        <input type="text" @bind="searchText" @bind:event="oninput" placeholder="🔍 Search destination or region..." class="tw-search-input" />
+        <div class="tw-pills">
+            @foreach (var cat in Categories)
+            {
+                <button class="tw-pill @(selectedCategory == cat ? "active" : "")" @onclick="@(() => selectedCategory = cat)">
+                    @cat
+                </button>
+            }
+        </div>
+    </div>
+
+    <!-- Results Count -->
+    <p class="tw-count">Showing <strong>@FilteredDestinations.Count()</strong> destinations</p>
+
+    <!-- Destinations Grid -->
+    <div class="tw-dest-grid">
+        @foreach (var item in FilteredDestinations)
+        {
+            <div class="tw-dest-card" @onclick="@(() => Nav.NavigateTo($"/destinations/{item.Id}"))">
+                <div class="tw-dest-img" style="background-image: url('@item.ImageUrl')">
+                    <span class="tw-badge-cat">@item.Category</span>
+                    <span class="tw-badge-rate">★ @item.Rating</span>
+                </div>
+                <div class="tw-dest-content">
+                    <span class="tw-dest-region">📍 @item.Region</span>
+                    <h3>@item.Name</h3>
+                    <p>@item.Description</p>
+                    <div class="tw-meta">
+                        <span>🗓️ Best: @item.BestSeason</span>
+                        <span>⏱️ @item.Duration</span>
+                    </div>
+                    <div class="tw-dest-bottom">
+                        <span class="tw-cost">PKR @item.Price</span>
+                        <button class="tw-btn-sm">View Details →</button>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+<style>
+    .tw-explore { font-family: 'Segoe UI', system-ui, sans-serif; color: #1e293b; }
+    .tw-explore-header {
+        background: linear-gradient(135deg, #0f172a, #0284c7);
+        color: #fff;
+        padding: 2.5rem 2rem;
+        border-radius: 16px;
+        margin-bottom: 1.75rem;
+    }
+    .tw-explore-header h1 { margin: 0 0 6px; font-size: 2.1rem; font-weight: 800; }
+    .tw-explore-header p { margin: 0; color: #e0f2fe; }
+    .tw-filter-bar {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1rem;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1.25rem;
+    }
+    .tw-search-input {
+        padding: 10px 16px;
+        border: 1px solid #cbd5e1;
+        border-radius: 10px;
+        min-width: 280px;
+        font-size: 0.95rem;
+        outline: none;
+    }
+    .tw-search-input:focus { border-color: #0284c7; }
+    .tw-pills { display: flex; gap: 8px; flex-wrap: wrap; }
+    .tw-pill {
+        background: #f1f5f9;
+        border: 1px solid #e2e8f0;
+        padding: 8px 16px;
+        border-radius: 999px;
+        font-weight: 600;
+        font-size: 0.88rem;
+        cursor: pointer;
+        color: #334155;
+        transition: all 0.2s;
+    }
+    .tw-pill.active, .tw-pill:hover { background: #0284c7; color: #fff; border-color: #0284c7; }
+    .tw-count { color: #64748b; font-size: 0.92rem; margin-bottom: 1rem; }
+    .tw-dest-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 1.5rem;
+    }
+    .tw-dest-card {
+        background: #fff;
+        border-radius: 14px;
+        overflow: hidden;
+        border: 1px solid #e2e8f0;
+        cursor: pointer;
+        transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .tw-dest-card:hover { transform: translateY(-4px); box-shadow: 0 12px 24px rgba(0,0,0,0.08); }
+    .tw-dest-img {
+        height: 195px;
+        background-size: cover;
+        background-position: center;
+        padding: 12px;
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+    }
+    .tw-badge-cat { background: rgba(15,23,42,0.85); color: #fff; padding: 4px 10px; border-radius: 6px; font-size: 0.78rem; font-weight: 600; }
+    .tw-badge-rate { background: #fff; color: #0f172a; padding: 4px 10px; border-radius: 6px; font-size: 0.82rem; font-weight: 700; }
+    .tw-dest-content { padding: 1.25rem; }
+    .tw-dest-region { font-size: 0.82rem; color: #0284c7; font-weight: 600; }
+    .tw-dest-content h3 { margin: 4px 0 8px; font-size: 1.25rem; }
+    .tw-dest-content p { font-size: 0.9rem; color: #64748b; line-height: 1.5; margin-bottom: 1rem; }
+    .tw-meta { display: flex; justify-content: space-between; font-size: 0.82rem; color: #475569; margin-bottom: 1rem; }
+    .tw-dest-bottom {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding-top: 12px;
+        border-top: 1px solid #f1f5f9;
+    }
+    .tw-cost { font-weight: 800; font-size: 1.05rem; color: #0f172a; }
+    .tw-btn-sm {
+        background: #e0f2fe;
+        color: #0369a1;
+        border: none;
+        padding: 7px 14px;
+        border-radius: 8px;
+        font-weight: 600;
+        cursor: pointer;
+    }
+</style>
+
+@code {
+    [SupplyParameterFromQuery(Name = "q")]
+    public string? QueryParam { get; set; }
+
+    private string searchText = "";
+    private string selectedCategory = "All";
+
+    protected override void OnParametersSet()
+    {
+        if (!string.IsNullOrWhiteSpace(QueryParam))
+            searchText = QueryParam;
+    }
+
+    private List<string> Categories = new() { "All", "Mountains", "Nature", "Heritage", "Coastal" };
+
+    private record DestinationItem(int Id, string Name, string Region, string Category, double Rating, string BestSeason, string Duration, string Price, string Description, string ImageUrl);
+
+    private List<DestinationItem> AllDestinations = new()
+    {
+        new(1, "Hunza Valley", "Gilgit-Baltistan", "Mountains", 4.9, "Apr - Oct", "5 Days", "28,000", "Iconic Rakaposhi views, Baltit & Altit Forts, Attabad Lake boating, and Passu Cones.", "https://unsplash.com"),
+        new(2, "Skardu Valley", "Gilgit-Baltistan", "Mountains", 4.9, "May - Sep", "6 Days", "32,000", "Home to Shangrila Resort, Deosai National Park, Satpara Lake, and Sarfaranga Cold Desert.", "https://unsplash.com"),
+        new(3, "Swat & Kalam", "Khyber Pakhtunkhwa", "Nature", 4.8, "Mar - Oct", "4 Days", "18,500", "Switzerland of the East featuring Malam Jabba, Ushu Forest, and Mahodand Lake.", "https://unsplash.com"),
+        new(4, "Fairy Meadows", "Diamer, GB", "Mountains", 4.9, "May - Sep", "4 Days", "25,000", "Breathtaking base camp trek facing the majestic Nanga Parbat Killer Mountain.", "https://unsplash.com"),
+        new(5, "Lahore Walled City", "Punjab", "Heritage", 4.7, "Oct - Mar", "3 Days", "14,000", "Badshahi Mosque, Lahore Fort, Shahi Hammam, and legendary Food Street culinary tours.", "https://unsplash.com"),
+        new(6, "Kund Malir & Hingol", "Balochistan", "Coastal", 4.8, "Oct - Apr", "3 Days", "16,500", "Golden desert cliffs meeting the Arabian Sea along the scenic Makran Coastal Highway.", "https://unsplash.com")
+    };
+
+    private IEnumerable<DestinationItem> FilteredDestinations => AllDestinations.Where(d =>
+        (selectedCategory == "All" || d.Category == selectedCategory) &&
+        (string.IsNullOrWhiteSpace(searchText) ||
+         d.Name.Contains(searchText, StringComparison.OrdinalIgnoreCase) ||
+         d.Region.Contains(searchText, StringComparison.OrdinalIgnoreCase))
+    );
+}

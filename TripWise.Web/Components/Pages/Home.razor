@@ -1,7 +1,240 @@
 ﻿@page "/"
+@rendermode InteractiveServer
+@inject NavigationManager Nav
 
-<PageTitle>Home</PageTitle>
+<PageTitle>TripWise - Smart Travel & Destination Planner</PageTitle>
 
-<h1>Hello, world!</h1>
+<div class="tw-home">
+    <!-- Hero Section -->
+    <section class="tw-hero">
+        <div class="tw-hero-overlay">
+            <span class="tw-badge">✈️ Explore Pakistan & Beyond</span>
+            <h1>Discover Your Next <span class="tw-accent">Unforgettable</span> Journey</h1>
+            <p>Plan smart trips, explore breathtaking destinations, find top-rated hotels, and experience authentic local cuisine—all in one place.</p>
 
-Welcome to your new app.
+            <div class="tw-search-bar">
+                <input type="text" @bind="searchQuery" @bind:event="oninput" placeholder="Where do you want to go? (e.g., Hunza, Skardu, Swat)" />
+                <button class="tw-btn-primary" @onclick="SearchDestinations">Explore Now</button>
+            </div>
+
+            <div class="tw-stats">
+                <div><strong>50+</strong><span>Curated Destinations</span></div>
+                <div><strong>200+</strong><span>Verified Hotels</span></div>
+                <div><strong>4.9★</strong><span>Traveler Rating</span></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Featured Destinations -->
+    <section class="tw-section">
+        <div class="tw-section-header">
+            <div>
+                <h2>Popular Destinations</h2>
+                <p>Handpicked places loved by travelers this season</p>
+            </div>
+            <a href="/destinations" class="tw-link-btn">View All Destinations →</a>
+        </div>
+
+        <div class="tw-grid">
+            @foreach (var dest in FeaturedDestinations)
+            {
+                <div class="tw-card" @onclick="@(() => GoToDetails(dest.Id))">
+                    <div class="tw-card-img" style="background-image: url('@dest.ImageUrl')">
+                        <span class="tw-tag">@dest.Category</span>
+                        <span class="tw-rating">★ @dest.Rating</span>
+                    </div>
+                    <div class="tw-card-body">
+                        <div class="tw-location">📍 @dest.Region</div>
+                        <h3>@dest.Name</h3>
+                        <p>@dest.ShortDesc</p>
+                        <div class="tw-card-footer">
+                            <span class="tw-price">From <strong>PKR @dest.StartingPrice</strong> / trip</span>
+                            <span class="tw-view-link">Details →</span>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </section>
+
+    <!-- Why TripWise -->
+    <section class="tw-features-section">
+        <h2>Why Plan With TripWise?</h2>
+        <div class="tw-features-grid">
+            <div class="tw-feature-box">
+                <div class="tw-icon">🗺️</div>
+                <h3>Curated Itineraries</h3>
+                <p>Day-by-day travel guides tailored to your budget, season, and travel style.</p>
+            </div>
+            <div class="tw-feature-box">
+                <div class="tw-icon">🏨</div>
+                <h3>Verified Stays</h3>
+                <p>Handpicked hotels and resorts with transparent pricing and real reviews.</p>
+            </div>
+            <div class="tw-feature-box">
+                <div class="tw-icon">🍽️</div>
+                <h3>Local Food Spots</h3>
+                <p>Never miss iconic local dishes and top-rated restaurants at every stop.</p>
+            </div>
+        </div>
+    </section>
+</div>
+
+<style>
+    .tw-home { font-family: 'Segoe UI', system-ui, sans-serif; color: #1e293b; }
+    .tw-hero {
+        background: linear-gradient(rgba(15, 23, 42, 0.65), rgba(15, 23, 42, 0.75)),
+                    url('https://unsplash.com') center/cover no-repeat;
+        border-radius: 18px;
+        padding: 4.5rem 2rem;
+        text-align: center;
+        color: #fff;
+        margin-bottom: 3rem;
+    }
+    .tw-hero-overlay { max-width: 760px; margin: 0 auto; }
+    .tw-badge {
+        background: rgba(255,255,255,0.18);
+        backdrop-filter: blur(6px);
+        padding: 6px 16px;
+        border-radius: 999px;
+        font-size: 0.88rem;
+        font-weight: 600;
+    }
+    .tw-hero h1 { font-size: 2.75rem; font-weight: 800; margin: 1rem 0; line-height: 1.2; }
+    .tw-accent { color: #38bdf8; }
+    .tw-hero p { font-size: 1.1rem; color: #e2e8f0; margin-bottom: 2rem; }
+    .tw-search-bar {
+        display: flex;
+        gap: 10px;
+        background: #fff;
+        padding: 8px;
+        border-radius: 12px;
+        max-width: 600px;
+        margin: 0 auto 2.5rem;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+    }
+    .tw-search-bar input {
+        flex: 1;
+        border: none;
+        outline: none;
+        padding: 10px 14px;
+        font-size: 1rem;
+        color: #0f172a;
+    }
+    .tw-btn-primary {
+        background: #0284c7;
+        color: #fff;
+        border: none;
+        padding: 12px 24px;
+        border-radius: 8px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background 0.2s;
+    }
+    .tw-btn-primary:hover { background: #0369a1; }
+    .tw-stats {
+        display: flex;
+        justify-content: center;
+        gap: 3rem;
+        flex-wrap: wrap;
+    }
+    .tw-stats strong { display: block; font-size: 1.5rem; color: #38bdf8; }
+    .tw-stats span { font-size: 0.85rem; color: #cbd5e1; }
+    .tw-section { margin-bottom: 3.5rem; }
+    .tw-section-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-end;
+        margin-bottom: 1.5rem;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+    .tw-section-header h2 { font-size: 1.8rem; font-weight: 700; margin: 0; }
+    .tw-section-header p { color: #64748b; margin: 4px 0 0; }
+    .tw-link-btn { color: #0284c7; font-weight: 600; text-decoration: none; }
+    .tw-link-btn:hover { text-decoration: underline; }
+    .tw-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+        gap: 1.5rem;
+    }
+    .tw-card {
+        background: #fff;
+        border-radius: 14px;
+        overflow: hidden;
+        border: 1px solid #e2e8f0;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.04);
+        cursor: pointer;
+        transition: transform 0.25s, box-shadow 0.25s;
+    }
+    .tw-card:hover { transform: translateY(-5px); box-shadow: 0 12px 24px rgba(0,0,0,0.1); }
+    .tw-card-img {
+        height: 200px;
+        background-size: cover;
+        background-position: center;
+        position: relative;
+        padding: 12px;
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+    }
+    .tw-tag { background: #0f172a; color: #fff; padding: 4px 10px; border-radius: 6px; font-size: 0.78rem; font-weight: 600; }
+    .tw-rating { background: #fff; color: #0f172a; padding: 4px 10px; border-radius: 6px; font-size: 0.82rem; font-weight: 700; }
+    .tw-card-body { padding: 1.25rem; }
+    .tw-location { font-size: 0.82rem; color: #0284c7; font-weight: 600; margin-bottom: 4px; }
+    .tw-card-body h3 { font-size: 1.25rem; margin: 0 0 8px; font-weight: 700; }
+    .tw-card-body p { font-size: 0.92rem; color: #64748b; margin: 0 0 1rem; line-height: 1.5; }
+    .tw-card-footer {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding-top: 12px;
+        border-top: 1px solid #f1f5f9;
+        font-size: 0.9rem;
+    }
+    .tw-view-link { color: #0284c7; font-weight: 600; }
+    .tw-features-section {
+        background: #f8fafc;
+        padding: 3rem 2rem;
+        border-radius: 16px;
+        text-align: center;
+    }
+    .tw-features-section h2 { font-size: 1.75rem; margin-bottom: 2rem; }
+    .tw-features-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+        gap: 1.5rem;
+    }
+    .tw-feature-box {
+        background: #fff;
+        padding: 1.75rem;
+        border-radius: 12px;
+        border: 1px solid #e2e8f0;
+    }
+    .tw-icon { font-size: 2rem; margin-bottom: 0.75rem; }
+    .tw-feature-box h3 { font-size: 1.15rem; margin-bottom: 0.5rem; }
+    .tw-feature-box p { color: #64748b; font-size: 0.92rem; margin: 0; }
+</style>
+
+@code {
+    private string searchQuery = "";
+
+    private void SearchDestinations()
+    {
+        if (!string.IsNullOrWhiteSpace(searchQuery))
+            Nav.NavigateTo($"/destinations?q={Uri.EscapeDataString(searchQuery)}");
+        else
+            Nav.NavigateTo("/destinations");
+    }
+
+    private void GoToDetails(int id) => Nav.NavigateTo($"/destinations/{id}");
+
+    private record DestCard(int Id, string Name, string Region, string Category, double Rating, string StartingPrice, string ShortDesc, string ImageUrl);
+
+    private List<DestCard> FeaturedDestinations = new()
+    {
+        new(1, "Hunza Valley", "Gilgit-Baltistan", "Mountains", 4.9, "28,000", "Snow-capped peaks, Karimabad forts, Attabad Lake, and autumn apricot blossoms.", "https://unsplash.com"),
+        new(2, "Skardu & Shangrila", "Gilgit-Baltistan", "Adventure", 4.9, "32,000", "Gateway to K2, Upper Kachura Lake, Deosai Plains, and cold desert dunes.", "https://unsplash.com"),
+        new(3, "Swat & Kalam", "Khyber Pakhtunkhwa", "Nature", 4.8, "18,500", "Lush green meadows, Mahodand Lake, pine forests, and crystal river valleys.", "https://unsplash.com")
+    };
+}
